@@ -2,6 +2,8 @@
 
 A lightweight React/Vite web app that lets players submit photo proof for each scavenger‑hunt challenge while an admin reviews and approves submissions in real time. Approved photos unlock coins; collecting ten coins opens the final chest.
 
+This repository contains a minimal MVP implementation located in the src folder.
+
 ---
 
 ## 1 Features
