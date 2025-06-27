@@ -8,7 +8,7 @@ This repository contains a minimal MVP implementation located in the src folder.
 
 ## 1 Features
 
-- **Email magic‑link authentication** for players and admin
+- **Email/password authentication** with browser password-manager prompts
 - **Role‑based access control** enforced by Supabase Row Level Security
 - **Image uploads** stored privately in Supabase Storage
 - **Real‑time updates**: players see status changes instantly
@@ -135,9 +135,9 @@ Repeat analogous policies for `coins`.
 npm run dev
 ```
 
-Access `<http://localhost:5173>`.
+- Access `<http://localhost:5173>`.
 
-- `/login` – email magic‑link sign‑in (check your inbox after submitting)
+- `/login` – email/password sign-in
 - `/hunt` – player dashboard
 - `/admin` – admin dashboard (role‑gated client‑side + RLS‑gated backend)
 
@@ -184,7 +184,7 @@ Access `<http://localhost:5173>`.
 
 ## 9 Player Workflow
 
-1. Sign in via magic link.
+1. Sign in with your email and password.
 2. Earliest unlocked challenge shows an **Upload** input.
 3. After upload, card turns yellow (pending). When admin approves, card turns green and the next challenge unlocks.
 

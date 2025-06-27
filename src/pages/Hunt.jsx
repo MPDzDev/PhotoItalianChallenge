@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import UploadPhoto from '../components/UploadPhoto';
+import { useNavigate } from 'react-router-dom';
 
 export default function Hunt() {
   const [user, setUser] = useState(null);
   const [challenges, setChallenges] = useState([]);
+  const navigate = useNavigate();
+
+  const ADMIN_WHITELIST = ['mdziedzic97@gmail.com'];
 
   useEffect(() => {
     let subscription;
@@ -45,6 +49,14 @@ export default function Hunt() {
 
   return (
     <div className="p-4 flex flex-col gap-4">
+      {ADMIN_WHITELIST.includes(user.email) && (
+        <button
+          onClick={() => navigate('/admin')}
+          className="bg-purple-600 text-white px-3 py-1 rounded self-start"
+        >
+          Go to Admin Panel
+        </button>
+      )}
       {challenges.map((c) => (
         <div key={c.id} className="border p-2">
           <h2 className="font-bold">{c.title}</h2>

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import AdminTable from '../components/AdminTable';
+import { Navigate } from 'react-router-dom';
 
 export default function Admin() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const ADMIN_WHITELIST = ['mdziedzic97@gmail.com'];
 
   useEffect(() => {
     let subscription;
@@ -30,6 +32,7 @@ export default function Admin() {
 
   if (loading) return null;
   if (!user) return <p className="p-4">Please log in first.</p>;
+  if (!ADMIN_WHITELIST.includes(user.email)) return <Navigate to="/hunt" replace />;
 
   return (
     <div className="p-4">
