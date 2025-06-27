@@ -8,6 +8,7 @@ export default function Hunt() {
   const [user, setUser] = useState(null);
   const [challenges, setChallenges] = useState([]);
   const [exampleUrls, setExampleUrls] = useState({});
+  const [submittedChallenges, setSubmittedChallenges] = useState(new Set());
   const navigate = useNavigate();
 
   const ADMIN_WHITELIST = ['mdziedzic97@gmail.com'];
@@ -32,6 +33,27 @@ export default function Hunt() {
       subscription?.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    async function loadSubmitted() {
+      const { data } = await supabase
+        .from('submissions')
+        .select('challenge_id')
+        .eq('user_id', user.id);
+      setSubmittedChallenges(new Set(data ? data.map((s) => s.challenge_id) : []));
+    }
+    loadSubmitted();
+    const channel = supabase
+      .channel('user_subs')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'submissions', filter: `user_id=eq.${user.id}` },
+        loadSubmitted
+      )
+      .subscribe();
+    return () => supabase.removeChannel(channel);
+  }, [user]);
 
   useEffect(() => {
     async function loadChallenges() {
@@ -88,14 +110,17 @@ export default function Hunt() {
           <h2 className="font-bold">{c.title}</h2>
           {c.description && <p className="italic">{c.description}</p>}
           {c.hint && <p>Hint: {c.hint}</p>}
-          {c.example_photo && (
-            <img
-              src={exampleUrls[c.id]}
-              alt="example"
-              className="h-32 my-2"
-            />
-          )}
-          <UploadPhoto challengeId={c.id} userId={user.id} />
+          <UploadPhoto
+            challengeId={c.id}
+            userId={user.id}
+            exampleUrl={exampleUrls[c.id]}
+            submitted={submittedChallenges.has(c.id)}
+            onUploaded={() =>
+              setSubmittedChallenges(
+                new Set([...submittedChallenges, c.id])
+              )
+            }
+          />
         </div>
       ))}
       <MySubmissions userId={user.id} />
