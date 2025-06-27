@@ -154,6 +154,7 @@ export default function Hunt() {
                   userId={user.id}
                   exampleUrl={exampleUrls[c.id]}
                   submitted={!!status}
+                  status={status}
                   userPhotoUrl={
                     mySubs[c.id] && mySubs[c.id].length > 0
                       ? subUrls[mySubs[c.id][0].id]
@@ -168,34 +169,6 @@ export default function Hunt() {
                     })
                   }
                 />
-                {mySubs[c.id] && mySubs[c.id].length > 0 && (
-                  <div>
-                    <h3 className="font-semibold mb-1">Your Submissions</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {mySubs[c.id].map((s) => (
-                        <div key={s.id} className="relative">
-                          <img
-                            src={subUrls[s.id]}
-                            alt="submission"
-                            className="h-24 w-full object-cover rounded cursor-pointer"
-                            onClick={() => setViewerUrl(subUrls[s.id])}
-                          />
-                          <span
-                            className={`absolute bottom-1 right-1 text-xs px-1 rounded bg-white bg-opacity-70 ${
-                              s.status === 'approved'
-                                ? 'text-green-700'
-                                : s.status === 'rejected'
-                                ? 'text-red-700'
-                                : 'text-yellow-700'
-                            }`}
-                          >
-                            {s.status}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
