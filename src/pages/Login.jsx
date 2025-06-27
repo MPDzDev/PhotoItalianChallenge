@@ -4,11 +4,21 @@ import { supabase } from '../supabaseClient';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   async function handleLogin(e) {
     e.preventDefault();
-    const { error } = await supabase.auth.signInWithOtp({ email });
-    if (!error) setSent(true);
+    setErrorMsg('');
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ email });
+      if (error) {
+        setErrorMsg(error.message || 'Login failed');
+      } else {
+        setSent(true);
+      }
+    } catch (err) {
+      setErrorMsg('Server error. Check configuration and network.');
+    }
   }
 
   return (
@@ -27,6 +37,7 @@ export default function Login() {
             className="border p-2"
           />
           <button className="bg-blue-500 text-white p-2">Send Magic Link</button>
+          {errorMsg && <p className="text-red-600">{errorMsg}</p>}
         </form>
       )}
     </div>

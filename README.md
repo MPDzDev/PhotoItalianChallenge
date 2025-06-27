@@ -137,7 +137,7 @@ npm run dev
 
 Access `<http://localhost:5173>`.
 
-- `/login` – email magic‑link sign‑in
+- `/login` – email magic‑link sign‑in (check your inbox after submitting)
 - `/hunt` – player dashboard
 - `/admin` – admin dashboard (role‑gated client‑side + RLS‑gated backend)
 
@@ -215,6 +215,7 @@ Access `<http://localhost:5173>`.
 | Magic‑link email not received | Verify Auth SMTP configuration or use OTP debug link in Supabase dashboard |
 | Photos 0 bytes                | Check Storage bucket rules and MIME type on upload                         |
 | RLS denies admin update       | Ensure `app_metadata.role` = `admin` and your JWT includes it              |
+| 500 error on login            | Verify `.env` contains valid Supabase keys and your Redirect URLs are allowed |
 
 ---
 
