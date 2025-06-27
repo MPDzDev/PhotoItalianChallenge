@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import UploadPhoto from '../components/UploadPhoto';
-import MySubmissions from '../components/MySubmissions';
 import { useNavigate } from 'react-router-dom';
 
 export default function Hunt() {
@@ -9,6 +8,8 @@ export default function Hunt() {
   const [challenges, setChallenges] = useState([]);
   const [exampleUrls, setExampleUrls] = useState({});
   const [challengeStatus, setChallengeStatus] = useState({});
+  const [mySubs, setMySubs] = useState({});
+  const [subUrls, setSubUrls] = useState({});
   const [expanded, setExpanded] = useState(null);
   const navigate = useNavigate();
 
@@ -40,15 +41,30 @@ export default function Hunt() {
     async function loadSubmitted() {
       const { data } = await supabase
         .from('submissions')
-        .select('challenge_id, status, created_at')
+        .select('id, challenge_id, status, photo_url, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
       const statusMap = {};
-      data?.forEach((s) => {
-        if (!statusMap[s.challenge_id]) statusMap[s.challenge_id] = s.status;
-      });
+      const subsMap = {};
+      const urls = {};
+      if (data) {
+        await Promise.all(
+          data.map(async (s) => {
+            if (!subsMap[s.challenge_id]) subsMap[s.challenge_id] = [];
+            subsMap[s.challenge_id].push(s);
+            if (!statusMap[s.challenge_id]) statusMap[s.challenge_id] = s.status;
+            if (s.photo_url) {
+              const { data: url } = await supabase.storage
+                .from('photos')
+                .createSignedUrl(s.photo_url, 60 * 60);
+              urls[s.id] = url?.signedUrl;
+            }
+          })
+        );
+      }
       setChallengeStatus(statusMap);
-
+      setMySubs(subsMap);
+      setSubUrls(urls);
     }
     loadSubmitted();
     const channel = supabase
@@ -118,19 +134,22 @@ export default function Hunt() {
         if (status === 'approved') rowClass = 'bg-green-200';
         else if (status === 'rejected') rowClass = 'bg-red-200';
         return (
-          <div key={c.id} className={`${rowClass} rounded shadow`}>
+          <div
+            key={c.id}
+            className={`${rowClass} rounded shadow transition hover:shadow-lg`}
+          >
             <div
               onClick={() => setExpanded(expanded === c.id ? null : c.id)}
-              className="p-2 cursor-pointer font-bold"
+              className="p-3 cursor-pointer font-bold text-lg"
             >
               {c.title}
             </div>
             {expanded === c.id && (
-              <div className="p-4 border-t bg-white rounded-b">
+              <div className="p-4 border-t bg-white rounded-b space-y-4">
                 {c.description && (
-                  <p className="italic mb-2">{c.description}</p>
+                  <p className="italic text-gray-700">{c.description}</p>
                 )}
-                {c.hint && <p className="mb-2">Hint: {c.hint}</p>}
+                {c.hint && <p className="text-sm text-gray-600">Hint: {c.hint}</p>}
                 <UploadPhoto
                   challengeId={c.id}
                   userId={user.id}
@@ -143,6 +162,33 @@ export default function Hunt() {
                     })
                   }
                 />
+                {mySubs[c.id] && mySubs[c.id].length > 0 && (
+                  <div>
+                    <h3 className="font-semibold mb-1">Your Submissions</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {mySubs[c.id].map((s) => (
+                        <div key={s.id} className="relative">
+                          <img
+                            src={subUrls[s.id]}
+                            alt="submission"
+                            className="h-24 w-full object-cover rounded"
+                          />
+                          <span
+                            className={`absolute bottom-1 right-1 text-xs px-1 rounded bg-white bg-opacity-70 ${
+                              s.status === 'approved'
+                                ? 'text-green-700'
+                                : s.status === 'rejected'
+                                ? 'text-red-700'
+                                : 'text-yellow-700'
+                            }`}
+                          >
+                            {s.status}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
