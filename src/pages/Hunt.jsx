@@ -94,7 +94,7 @@ export default function Hunt() {
               className="h-32 my-2"
             />
           )}
-          <UploadPhoto challengeId={c.id} />
+          <UploadPhoto challengeId={c.id} userId={user.id} />
         </div>
       ))}
     </div>

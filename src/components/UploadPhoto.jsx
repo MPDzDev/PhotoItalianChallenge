@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 
-export default function UploadPhoto({ challengeId }) {
+export default function UploadPhoto({ challengeId, userId }) {
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState('');
 
@@ -16,6 +16,7 @@ export default function UploadPhoto({ challengeId }) {
     await supabase.from('submissions').insert({
       challenge_id: challengeId,
       photo_url: data.path,
+      user_id: userId,
     });
     setStatus('Submitted');
   }
