@@ -3,11 +3,12 @@ import { supabase } from '../supabaseClient';
 import AdminTable from '../components/AdminTable';
 import CreateChallenge from '../components/CreateChallenge';
 import ChallengeList from '../components/ChallengeList';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 export default function Admin() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const ADMIN_WHITELIST = ['mdziedzic97@gmail.com'];
 
   useEffect(() => {
@@ -38,6 +39,12 @@ export default function Admin() {
 
   return (
     <div className="p-4">
+      <button
+        onClick={() => navigate('/hunt')}
+        className="bg-purple-600 text-white px-3 py-1 rounded mb-4"
+      >
+        Go to Hunt Panel
+      </button>
       <h1 className="text-xl mb-4">Admin Dashboard</h1>
       <CreateChallenge />
       <ChallengeList />
