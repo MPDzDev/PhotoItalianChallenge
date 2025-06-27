@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 export default function Hunt() {
   const [user, setUser] = useState(null);
   const [challenges, setChallenges] = useState([]);
+  const [exampleUrls, setExampleUrls] = useState({});
   const navigate = useNavigate();
 
   const ADMIN_WHITELIST = ['mdziedzic97@gmail.com'];
@@ -39,6 +40,21 @@ export default function Hunt() {
         .eq('active', true)
         .order('sort_order');
       setChallenges(data || []);
+      if (data) {
+        const urls = {};
+        await Promise.all(
+          data.map(async (c) => {
+            if (c.example_photo) {
+              const { data: url } = await supabase
+                .storage
+                .from('photos')
+                .createSignedUrl(c.example_photo, 60 * 60);
+              urls[c.id] = url?.signedUrl;
+            }
+          })
+        );
+        setExampleUrls(urls);
+      }
     }
     loadChallenges();
     const channel = supabase
@@ -73,7 +89,7 @@ export default function Hunt() {
           {c.hint && <p>Hint: {c.hint}</p>}
           {c.example_photo && (
             <img
-              src={supabase.storage.from('photos').getPublicUrl(c.example_photo).data.publicUrl}
+              src={exampleUrls[c.id]}
               alt="example"
               className="h-32 my-2"
             />

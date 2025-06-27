@@ -73,6 +73,8 @@ VITE_SUPABASE_ANON=public‑anon‑key
 
 - Create bucket **photos**.
 - Keep **Public bucket** **off** (private).
+- When retrieving images, generate a temporary link with
+  `createSignedUrl` (e.g., 1 hour expiry) instead of `getPublicUrl`.
 
 ### 4.3 Database schema
 
