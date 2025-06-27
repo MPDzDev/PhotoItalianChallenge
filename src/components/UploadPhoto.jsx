@@ -65,7 +65,7 @@ export default function UploadPhoto({
           </div>
         )}
       </div>
-      <div className="mt-2 text-center text-sm">
+      <div className="mt-2 text-center text-sm handwriting">
         <p className="font-bold">{title}</p>
         {description && <p className="italic">{description}</p>}
       </div>
