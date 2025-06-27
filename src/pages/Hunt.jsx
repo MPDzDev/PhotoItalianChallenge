@@ -48,6 +48,7 @@ export default function Hunt() {
         if (!statusMap[s.challenge_id]) statusMap[s.challenge_id] = s.status;
       });
       setChallengeStatus(statusMap);
+
     }
     loadSubmitted();
     const channel = supabase
@@ -147,7 +148,6 @@ export default function Hunt() {
           </div>
         );
       })}
-      <MySubmissions userId={user.id} />
     </div>
   );
 }
