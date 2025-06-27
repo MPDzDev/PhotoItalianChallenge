@@ -33,7 +33,11 @@ export default function Hunt() {
 
   useEffect(() => {
     async function loadChallenges() {
-      const { data } = await supabase.from('challenges').select('*').order('sort_order');
+      const { data } = await supabase
+        .from('challenges')
+        .select('*')
+        .eq('active', true)
+        .order('sort_order');
       setChallenges(data || []);
     }
     loadChallenges();
@@ -60,7 +64,15 @@ export default function Hunt() {
       {challenges.map((c) => (
         <div key={c.id} className="border p-2">
           <h2 className="font-bold">{c.title}</h2>
-          <p>{c.clue}</p>
+          {c.description && <p className="italic">{c.description}</p>}
+          {c.hint && <p>Hint: {c.hint}</p>}
+          {c.example_photo && (
+            <img
+              src={supabase.storage.from('photos').getPublicUrl(c.example_photo).data.publicUrl}
+              alt="example"
+              className="h-32 my-2"
+            />
+          )}
           <UploadPhoto challengeId={c.id} />
         </div>
       ))}

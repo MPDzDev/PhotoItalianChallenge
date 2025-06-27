@@ -82,7 +82,10 @@ Execute in *SQL Editor*:
 create table challenges (
   id uuid primary key default gen_random_uuid(),
   title text not null,
-  clue text,
+  description text,
+  hint text,
+  example_photo text,
+  active boolean default false,
   sort_order int not null
 );
 
