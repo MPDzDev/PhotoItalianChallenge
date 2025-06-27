@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { supabase } from '../supabaseClient';
+import FullScreenImage from './FullScreenImage';
 
 export default function UploadPhoto({
   challengeId,
@@ -10,6 +11,7 @@ export default function UploadPhoto({
 }) {
   const inputRef = useRef(null);
   const [status, setStatus] = useState('');
+  const [showExample, setShowExample] = useState(false);
 
   async function handleFile(e) {
     const file = e.target.files?.[0];
@@ -32,12 +34,21 @@ export default function UploadPhoto({
   return (
     <div className="relative mt-2">
       {exampleUrl && (
-        <img
-          src={exampleUrl}
-          alt="example"
-          className="h-32 w-full object-cover rounded"
-          onClick={() => !submitted && inputRef.current.click()}
-        />
+        <>
+          <img
+            src={exampleUrl}
+            alt="example"
+            className="h-32 w-full object-cover rounded cursor-pointer"
+            onClick={() => setShowExample(true)}
+          />
+          {showExample && (
+            <FullScreenImage
+              src={exampleUrl}
+              alt="example"
+              onClose={() => setShowExample(false)}
+            />
+          )}
+        </>
       )}
       {!submitted && (
         <div

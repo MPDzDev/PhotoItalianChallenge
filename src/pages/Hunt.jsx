@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import UploadPhoto from '../components/UploadPhoto';
+import FullScreenImage from '../components/FullScreenImage';
 import { useNavigate } from 'react-router-dom';
 
 export default function Hunt() {
@@ -11,6 +12,7 @@ export default function Hunt() {
   const [mySubs, setMySubs] = useState({});
   const [subUrls, setSubUrls] = useState({});
   const [expanded, setExpanded] = useState(null);
+  const [viewerUrl, setViewerUrl] = useState(null);
   const navigate = useNavigate();
 
   const ADMIN_WHITELIST = ['mdziedzic97@gmail.com'];
@@ -171,7 +173,8 @@ export default function Hunt() {
                           <img
                             src={subUrls[s.id]}
                             alt="submission"
-                            className="h-24 w-full object-cover rounded"
+                            className="h-24 w-full object-cover rounded cursor-pointer"
+                            onClick={() => setViewerUrl(subUrls[s.id])}
                           />
                           <span
                             className={`absolute bottom-1 right-1 text-xs px-1 rounded bg-white bg-opacity-70 ${
@@ -194,6 +197,13 @@ export default function Hunt() {
           </div>
         );
       })}
+      {viewerUrl && (
+        <FullScreenImage
+          src={viewerUrl}
+          alt="submission"
+          onClose={() => setViewerUrl(null)}
+        />
+      )}
     </div>
   );
 }

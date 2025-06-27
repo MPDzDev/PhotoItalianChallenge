@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
+import FullScreenImage from './FullScreenImage';
 
 export default function AdminTable() {
   const [submissions, setSubmissions] = useState([]);
   const [signedUrls, setSignedUrls] = useState({});
+  const [viewerUrl, setViewerUrl] = useState(null);
 
   useEffect(() => {
     const channel = supabase
@@ -48,7 +50,8 @@ export default function AdminTable() {
   }
 
   return (
-    <table className="w-full border-collapse">
+    <div className="relative">
+      <table className="w-full border-collapse">
       <thead>
         <tr>
           <th className="border p-2">Photo</th>
@@ -60,7 +63,12 @@ export default function AdminTable() {
         {submissions.map((s) => (
           <tr key={s.id} className="border-t">
             <td className="border p-2">
-              <img src={signedUrls[s.id]} alt="submission" className="h-20" />
+              <img
+                src={signedUrls[s.id]}
+                alt="submission"
+                className="h-20 cursor-pointer"
+                onClick={() => setViewerUrl(signedUrls[s.id])}
+              />
             </td>
             <td className="border p-2">{s.status}</td>
             <td className="border p-2">
@@ -70,6 +78,10 @@ export default function AdminTable() {
           </tr>
         ))}
       </tbody>
-    </table>
+      </table>
+      {viewerUrl && (
+        <FullScreenImage src={viewerUrl} alt="submission" onClose={() => setViewerUrl(null)} />
+      )}
+    </div>
   );
 }
