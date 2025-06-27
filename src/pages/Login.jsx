@@ -28,13 +28,15 @@ export default function Login() {
     };
   }, [navigate]);
 
-  async function handleLogin(e) {
-    e.preventDefault();
+  async function handleAuth(type) {
     setErrorMsg('');
     try {
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: type === 'register' },
+      });
       if (error) {
-        setErrorMsg(error.message || 'Login failed');
+        setErrorMsg(error.message || 'Authentication failed');
       } else {
         setSent(true);
       }
@@ -44,23 +46,38 @@ export default function Login() {
   }
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="text-xl mb-4">Login</h1>
+    <div className="p-4 max-w-md mx-auto text-center">
+      <h1 className="text-3xl mb-4">Welcome, matey!</h1>
       {sent ? (
         <p>Check your email for a magic link.</p>
       ) : (
-        <form onSubmit={handleLogin} className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             required
-            className="border p-2"
+            className="border p-2 rounded"
           />
-          <button className="bg-blue-500 text-white p-2">Send Magic Link</button>
+          <div className="flex justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => handleAuth('login')}
+              className="bg-blue-600 text-white px-4 py-2 rounded"
+            >
+              Login
+            </button>
+            <button
+              type="button"
+              onClick={() => handleAuth('register')}
+              className="bg-green-600 text-white px-4 py-2 rounded"
+            >
+              Register
+            </button>
+          </div>
           {errorMsg && <p className="text-red-600">{errorMsg}</p>}
-        </form>
+        </div>
       )}
     </div>
   );

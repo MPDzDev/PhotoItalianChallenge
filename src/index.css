@@ -1,0 +1,9 @@
+body {
+  font-family: 'Pirata One', cursive;
+  background: linear-gradient(to bottom, #f9f4e7, #f5d9a4);
+  min-height: 100vh;
+}
+
+input, button {
+  font-family: inherit;
+}
