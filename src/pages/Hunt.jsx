@@ -7,11 +7,24 @@ export default function Hunt() {
   const [challenges, setChallenges] = useState([]);
 
   useEffect(() => {
-    const session = supabase.auth.session ? supabase.auth.session() : null;
-    setUser(session?.user || null);
-    supabase.auth.onAuthStateChange((_event, session) => {
+    let subscription;
+    async function loadSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+    }
+    loadSession();
+
+    const {
+      data: { subscription: sub },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
     });
+    subscription = sub;
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
