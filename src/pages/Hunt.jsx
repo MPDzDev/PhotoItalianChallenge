@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import UploadPhoto from '../components/UploadPhoto';
+import MySubmissions from '../components/MySubmissions';
 import { useNavigate } from 'react-router-dom';
 
 export default function Hunt() {
@@ -97,6 +98,7 @@ export default function Hunt() {
           <UploadPhoto challengeId={c.id} userId={user.id} />
         </div>
       ))}
+      <MySubmissions userId={user.id} />
     </div>
   );
 }
