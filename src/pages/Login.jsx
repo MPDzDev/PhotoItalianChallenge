@@ -54,7 +54,14 @@ export default function Login() {
           password,
         });
         if (error) {
-          setErrorMsg(error.message || 'Registration failed');
+          if (
+            error.message &&
+            /already\s*registered|exists/i.test(error.message)
+          ) {
+            setErrorMsg('Account already exists. Please log in.');
+          } else {
+            setErrorMsg(error.message || 'Registration failed');
+          }
         } else {
           await storeCredentials();
           setMessage('Check your email to confirm your account.');
