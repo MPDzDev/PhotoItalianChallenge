@@ -9,6 +9,8 @@ export default function Hunt() {
   const [challenges, setChallenges] = useState([]);
   const [exampleUrls, setExampleUrls] = useState({});
   const [submittedChallenges, setSubmittedChallenges] = useState(new Set());
+  const [challengeStatus, setChallengeStatus] = useState({});
+  const [openId, setOpenId] = useState(null);
   const navigate = useNavigate();
 
   const ADMIN_WHITELIST = ['mdziedzic97@gmail.com'];
@@ -39,9 +41,14 @@ export default function Hunt() {
     async function loadSubmitted() {
       const { data } = await supabase
         .from('submissions')
-        .select('challenge_id')
+        .select('challenge_id, status')
         .eq('user_id', user.id);
       setSubmittedChallenges(new Set(data ? data.map((s) => s.challenge_id) : []));
+      const statuses = {};
+      data?.forEach((s) => {
+        statuses[s.challenge_id] = s.status;
+      });
+      setChallengeStatus(statuses);
     }
     loadSubmitted();
     const channel = supabase
@@ -105,24 +112,47 @@ export default function Hunt() {
           Go to Admin Panel
         </button>
       )}
-      {challenges.map((c) => (
-        <div key={c.id} className="border p-2">
-          <h2 className="font-bold">{c.title}</h2>
-          {c.description && <p className="italic">{c.description}</p>}
-          {c.hint && <p>Hint: {c.hint}</p>}
-          <UploadPhoto
-            challengeId={c.id}
-            userId={user.id}
-            exampleUrl={exampleUrls[c.id]}
-            submitted={submittedChallenges.has(c.id)}
-            onUploaded={() =>
-              setSubmittedChallenges(
-                new Set([...submittedChallenges, c.id])
-              )
-            }
-          />
-        </div>
-      ))}
+      {challenges.map((c) => {
+        const status = challengeStatus[c.id];
+        const rowColor =
+          status === 'approved'
+            ? 'bg-green-200'
+            : status === 'rejected'
+            ? 'bg-red-200'
+            : 'bg-amber-200';
+        const isOpen = openId === c.id;
+        return (
+          <div key={c.id} className="border rounded overflow-hidden">
+            <div
+              className={`p-2 font-bold cursor-pointer ${rowColor}`}
+              onClick={() => setOpenId(isOpen ? null : c.id)}
+            >
+              {c.title}
+            </div>
+            {isOpen && (
+              <div className="p-2 bg-white">
+                {c.description && <p className="italic mb-2">{c.description}</p>}
+                {c.hint && <p className="mb-2">Hint: {c.hint}</p>}
+                <UploadPhoto
+                  challengeId={c.id}
+                  userId={user.id}
+                  exampleUrl={exampleUrls[c.id]}
+                  submitted={submittedChallenges.has(c.id)}
+                  onUploaded={() => {
+                    setSubmittedChallenges(
+                      new Set([...submittedChallenges, c.id])
+                    );
+                    setChallengeStatus((prev) => ({
+                      ...prev,
+                      [c.id]: 'pending',
+                    }));
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })
       <MySubmissions userId={user.id} />
     </div>
   );
