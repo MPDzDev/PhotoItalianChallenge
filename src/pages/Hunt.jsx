@@ -128,72 +128,88 @@ export default function Hunt() {
           Go to Admin Panel
         </button>
       )}
-      {challenges.map((c) => {
-        const status = challengeStatus[c.id];
-        let rowClass = 'bg-amber-100';
-        if (status === 'approved') rowClass = 'bg-green-200';
-        else if (status === 'rejected') rowClass = 'bg-red-200';
-        return (
-          <div
-            key={c.id}
-            className={`${rowClass} rounded shadow transition hover:shadow-lg`}
-          >
+      <div className="carousel w-full">
+        {challenges.map((c, idx) => {
+          const status = challengeStatus[c.id];
+          let rowClass = 'bg-amber-100';
+          if (status === 'approved') rowClass = 'bg-green-200';
+          else if (status === 'rejected') rowClass = 'bg-red-200';
+          return (
             <div
-              onClick={() => setExpanded(expanded === c.id ? null : c.id)}
-              className="p-3 cursor-pointer font-bold text-lg"
+              key={c.id}
+              id={`slide${idx}`}
+              className="carousel-item w-full flex justify-center"
             >
-              {c.title}
-            </div>
-            {expanded === c.id && (
-              <div className="p-4 border-t bg-white rounded-b space-y-4">
-                {c.description && (
-                  <p className="italic text-gray-700">{c.description}</p>
-                )}
-                {c.hint && <p className="text-sm text-gray-600">Hint: {c.hint}</p>}
-                <UploadPhoto
-                  challengeId={c.id}
-                  userId={user.id}
-                  exampleUrl={exampleUrls[c.id]}
-                  submitted={!!status}
-                  onUploaded={() =>
-                    setChallengeStatus({
-                      ...challengeStatus,
-                      [c.id]: 'pending',
-                    })
-                  }
-                />
-                {mySubs[c.id] && mySubs[c.id].length > 0 && (
-                  <div>
-                    <h3 className="font-semibold mb-1">Your Submissions</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {mySubs[c.id].map((s) => (
-                        <div key={s.id} className="relative">
-                          <img
-                            src={subUrls[s.id]}
-                            alt="submission"
-                            className="h-24 w-full object-cover rounded"
-                          />
-                          <span
-                            className={`absolute bottom-1 right-1 text-xs px-1 rounded bg-white bg-opacity-70 ${
-                              s.status === 'approved'
-                                ? 'text-green-700'
-                                : s.status === 'rejected'
-                                ? 'text-red-700'
-                                : 'text-yellow-700'
-                            }`}
-                          >
-                            {s.status}
-                          </span>
+              <div
+                className={`${rowClass} w-full max-w-md rounded shadow transition hover:shadow-lg`}
+              >
+                <div
+                  onClick={() => setExpanded(expanded === c.id ? null : c.id)}
+                  className="p-3 cursor-pointer font-bold text-lg"
+                >
+                  {c.title}
+                </div>
+                {expanded === c.id && (
+                  <div className="p-4 border-t bg-white rounded-b space-y-4">
+                    {c.description && (
+                      <p className="italic text-gray-700">{c.description}</p>
+                    )}
+                    {c.hint && <p className="text-sm text-gray-600">Hint: {c.hint}</p>}
+                    <UploadPhoto
+                      challengeId={c.id}
+                      userId={user.id}
+                      exampleUrl={exampleUrls[c.id]}
+                      submitted={!!status}
+                      onUploaded={() =>
+                        setChallengeStatus({
+                          ...challengeStatus,
+                          [c.id]: 'pending',
+                        })
+                      }
+                    />
+                    {mySubs[c.id] && mySubs[c.id].length > 0 && (
+                      <div>
+                        <h3 className="font-semibold mb-1">Your Submissions</h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {mySubs[c.id].map((s) => (
+                            <div key={s.id} className="relative">
+                              <img
+                                src={subUrls[s.id]}
+                                alt="submission"
+                                className="h-24 w-full object-cover rounded"
+                              />
+                              <span
+                                className={`absolute bottom-1 right-1 text-xs px-1 rounded bg-white bg-opacity-70 ${
+                                  s.status === 'approved'
+                                    ? 'text-green-700'
+                                    : s.status === 'rejected'
+                                    ? 'text-red-700'
+                                    : 'text-yellow-700'
+                                }`}
+                              >
+                                {s.status}
+                              </span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-            )}
-          </div>
-        );
-      })}
+            </div>
+          );
+        })}
+      </div>
+      {challenges.length > 1 && (
+        <div className="flex justify-center w-full py-2 gap-2">
+          {challenges.map((_c, idx) => (
+            <a key={idx} href={`#slide${idx}`} className="btn btn-xs">
+              {idx + 1}
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
