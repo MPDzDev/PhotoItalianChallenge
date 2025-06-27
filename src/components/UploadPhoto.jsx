@@ -7,6 +7,7 @@ export default function UploadPhoto({
   userId,
   exampleUrl,
   submitted,
+  userPhotoUrl,
   onUploaded,
 }) {
   const inputRef = useRef(null);
@@ -31,19 +32,21 @@ export default function UploadPhoto({
     onUploaded?.();
   }
 
+  const photoSrc = submitted && userPhotoUrl ? userPhotoUrl : exampleUrl;
+
   return (
-    <div className="relative mt-2">
-      {exampleUrl && (
+    <div className="relative mt-2 polaroid">
+      {photoSrc && (
         <>
           <img
-            src={exampleUrl}
+            src={photoSrc}
             alt="example"
-            className="h-32 w-full object-cover rounded cursor-pointer"
+            className="h-32 w-full object-cover cursor-pointer"
             onClick={() => setShowExample(true)}
           />
           {showExample && (
             <FullScreenImage
-              src={exampleUrl}
+              src={photoSrc}
               alt="example"
               onClose={() => setShowExample(false)}
             />

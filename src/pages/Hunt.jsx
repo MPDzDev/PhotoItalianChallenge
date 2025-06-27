@@ -157,6 +157,11 @@ export default function Hunt() {
                   userId={user.id}
                   exampleUrl={exampleUrls[c.id]}
                   submitted={!!status}
+                  userPhotoUrl={
+                    mySubs[c.id] && mySubs[c.id].length > 0
+                      ? subUrls[mySubs[c.id][0].id]
+                      : null
+                  }
                   onUploaded={() =>
                     setChallengeStatus({
                       ...challengeStatus,
