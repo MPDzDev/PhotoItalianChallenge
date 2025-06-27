@@ -9,6 +9,8 @@ export default function UploadPhoto({
   submitted,
   userPhotoUrl,
   onUploaded,
+  title,
+  description,
 }) {
   const inputRef = useRef(null);
   const [status, setStatus] = useState('');
@@ -35,32 +37,38 @@ export default function UploadPhoto({
   const photoSrc = submitted && userPhotoUrl ? userPhotoUrl : exampleUrl;
 
   return (
-    <div className="relative mt-2 polaroid">
-      {photoSrc && (
-        <>
-          <img
-            src={photoSrc}
-            alt="example"
-            className="h-32 w-full object-cover cursor-pointer"
-            onClick={() => setShowExample(true)}
-          />
-          {showExample && (
-            <FullScreenImage
+    <div className="mt-2 polaroid">
+      <div className="relative">
+        {photoSrc && (
+          <>
+            <img
               src={photoSrc}
               alt="example"
-              onClose={() => setShowExample(false)}
+              className="w-full object-contain max-h-64 cursor-pointer"
+              onClick={() => setShowExample(true)}
             />
-          )}
-        </>
-      )}
-      {!submitted && (
-        <div
-          onClick={() => inputRef.current.click()}
-          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-semibold rounded animate-heartbeat cursor-pointer"
-        >
-          Click to upload your version
-        </div>
-      )}
+            {showExample && (
+              <FullScreenImage
+                src={photoSrc}
+                alt="example"
+                onClose={() => setShowExample(false)}
+              />
+            )}
+          </>
+        )}
+        {!submitted && (
+          <div
+            onClick={() => inputRef.current.click()}
+            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-semibold animate-heartbeat cursor-pointer"
+          >
+            Click to upload your version
+          </div>
+        )}
+      </div>
+      <div className="mt-2 text-center text-sm">
+        <p className="font-bold">{title}</p>
+        {description && <p className="italic">{description}</p>}
+      </div>
       <input
         type="file"
         ref={inputRef}

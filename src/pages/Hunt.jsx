@@ -148,9 +148,6 @@ export default function Hunt() {
             </div>
             {expanded === c.id && (
               <div className="p-4 border-t bg-white rounded-b space-y-4">
-                {c.description && (
-                  <p className="italic text-gray-700">{c.description}</p>
-                )}
                 {c.hint && <p className="text-sm text-gray-600">Hint: {c.hint}</p>}
                 <UploadPhoto
                   challengeId={c.id}
@@ -162,6 +159,8 @@ export default function Hunt() {
                       ? subUrls[mySubs[c.id][0].id]
                       : null
                   }
+                  title={c.title}
+                  description={c.description}
                   onUploaded={() =>
                     setChallengeStatus({
                       ...challengeStatus,
