@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import AdminTable from '../components/AdminTable';
+import CreateChallenge from '../components/CreateChallenge';
 import { Navigate } from 'react-router-dom';
 
 export default function Admin() {
@@ -37,6 +38,7 @@ export default function Admin() {
   return (
     <div className="p-4">
       <h1 className="text-xl mb-4">Admin Dashboard</h1>
+      <CreateChallenge />
       <AdminTable />
     </div>
   );
