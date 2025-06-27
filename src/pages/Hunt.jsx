@@ -41,6 +41,11 @@ export default function Hunt() {
       setChallenges(data || []);
     }
     loadChallenges();
+    const channel = supabase
+      .channel('challenges')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'challenges' }, loadChallenges)
+      .subscribe();
+    return () => supabase.removeChannel(channel);
   }, []);
 
   if (!user) {
