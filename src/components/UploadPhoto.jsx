@@ -7,13 +7,14 @@ export default function UploadPhoto({
   userId,
   exampleUrl,
   submitted,
+  status,
   userPhotoUrl,
   onUploaded,
   title,
   description,
 }) {
   const inputRef = useRef(null);
-  const [status, setStatus] = useState('');
+  const [message, setMessage] = useState('');
   const [showExample, setShowExample] = useState(false);
 
   async function handleFile(e) {
@@ -23,14 +24,14 @@ export default function UploadPhoto({
     const { data, error } = await supabase.storage
       .from('photos')
       .upload(filename, file);
-    if (error) return setStatus('Upload failed');
+    if (error) return setMessage('Upload failed');
 
     await supabase.from('submissions').insert({
       challenge_id: challengeId,
       photo_url: data.path,
       user_id: userId,
     });
-    setStatus('Submitted');
+    setMessage('Submitted');
     onUploaded?.();
   }
 
@@ -47,6 +48,19 @@ export default function UploadPhoto({
               className="w-full object-contain max-h-64 cursor-pointer"
               onClick={() => setShowExample(true)}
             />
+            {status && (
+              <span
+                className={`absolute bottom-1 right-1 text-xs px-1 rounded bg-white bg-opacity-70 ${
+                  status === 'approved'
+                    ? 'text-green-700'
+                    : status === 'rejected'
+                    ? 'text-red-700'
+                    : 'text-yellow-700'
+                }`}
+              >
+                {status}
+              </span>
+            )}
             {showExample && (
               <FullScreenImage
                 src={photoSrc}
@@ -75,7 +89,7 @@ export default function UploadPhoto({
         onChange={handleFile}
         className="hidden"
       />
-      {status && <p className="text-green-700 mt-1">{status}</p>}
+      {message && <p className="text-green-700 mt-1">{message}</p>}
     </div>
   );
 }
