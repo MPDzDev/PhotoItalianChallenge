@@ -128,7 +128,7 @@ export default function Hunt() {
           Go to Admin Panel
         </button>
       )}
-      <div className="carousel w-full">
+      <div className="carousel rounded-box">
         {challenges.map((c, idx) => {
           const status = challengeStatus[c.id];
           let rowClass = 'bg-amber-100';
@@ -137,7 +137,6 @@ export default function Hunt() {
           return (
             <div
               key={c.id}
-              id={`slide${idx}`}
               className="carousel-item w-full flex justify-center"
             >
               <div
@@ -201,15 +200,6 @@ export default function Hunt() {
           );
         })}
       </div>
-      {challenges.length > 1 && (
-        <div className="flex justify-center w-full py-2 gap-2">
-          {challenges.map((_c, idx) => (
-            <a key={idx} href={`#slide${idx}`} className="btn btn-xs">
-              {idx + 1}
-            </a>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
