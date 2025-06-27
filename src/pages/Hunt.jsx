@@ -8,7 +8,8 @@ export default function Hunt() {
   const [user, setUser] = useState(null);
   const [challenges, setChallenges] = useState([]);
   const [exampleUrls, setExampleUrls] = useState({});
-  const [submittedChallenges, setSubmittedChallenges] = useState(new Set());
+  const [challengeStatus, setChallengeStatus] = useState({});
+  const [expanded, setExpanded] = useState(null);
   const navigate = useNavigate();
 
   const ADMIN_WHITELIST = ['mdziedzic97@gmail.com'];
@@ -39,9 +40,14 @@ export default function Hunt() {
     async function loadSubmitted() {
       const { data } = await supabase
         .from('submissions')
-        .select('challenge_id')
-        .eq('user_id', user.id);
-      setSubmittedChallenges(new Set(data ? data.map((s) => s.challenge_id) : []));
+        .select('challenge_id, status, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      const statusMap = {};
+      data?.forEach((s) => {
+        if (!statusMap[s.challenge_id]) statusMap[s.challenge_id] = s.status;
+      });
+      setChallengeStatus(statusMap);
     }
     loadSubmitted();
     const channel = supabase
@@ -105,24 +111,42 @@ export default function Hunt() {
           Go to Admin Panel
         </button>
       )}
-      {challenges.map((c) => (
-        <div key={c.id} className="border p-2">
-          <h2 className="font-bold">{c.title}</h2>
-          {c.description && <p className="italic">{c.description}</p>}
-          {c.hint && <p>Hint: {c.hint}</p>}
-          <UploadPhoto
-            challengeId={c.id}
-            userId={user.id}
-            exampleUrl={exampleUrls[c.id]}
-            submitted={submittedChallenges.has(c.id)}
-            onUploaded={() =>
-              setSubmittedChallenges(
-                new Set([...submittedChallenges, c.id])
-              )
-            }
-          />
-        </div>
-      ))}
+      {challenges.map((c) => {
+        const status = challengeStatus[c.id];
+        let rowClass = 'bg-amber-100';
+        if (status === 'approved') rowClass = 'bg-green-200';
+        else if (status === 'rejected') rowClass = 'bg-red-200';
+        return (
+          <div key={c.id} className={`${rowClass} rounded shadow`}>
+            <div
+              onClick={() => setExpanded(expanded === c.id ? null : c.id)}
+              className="p-2 cursor-pointer font-bold"
+            >
+              {c.title}
+            </div>
+            {expanded === c.id && (
+              <div className="p-4 border-t bg-white rounded-b">
+                {c.description && (
+                  <p className="italic mb-2">{c.description}</p>
+                )}
+                {c.hint && <p className="mb-2">Hint: {c.hint}</p>}
+                <UploadPhoto
+                  challengeId={c.id}
+                  userId={user.id}
+                  exampleUrl={exampleUrls[c.id]}
+                  submitted={!!status}
+                  onUploaded={() =>
+                    setChallengeStatus({
+                      ...challengeStatus,
+                      [c.id]: 'pending',
+                    })
+                  }
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
       <MySubmissions userId={user.id} />
     </div>
   );
