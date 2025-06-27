@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { supabase } from '../supabaseClient';
 
-export default function UploadPhoto({ challengeId, userId }) {
-  const [file, setFile] = useState(null);
+export default function UploadPhoto({
+  challengeId,
+  userId,
+  exampleUrl,
+  submitted,
+  onUploaded,
+}) {
+  const inputRef = useRef(null);
   const [status, setStatus] = useState('');
 
-  async function handleUpload() {
+  async function handleFile(e) {
+    const file = e.target.files?.[0];
     if (!file) return;
     const filename = `${crypto.randomUUID()}`;
     const { data, error } = await supabase.storage
@@ -19,15 +26,34 @@ export default function UploadPhoto({ challengeId, userId }) {
       user_id: userId,
     });
     setStatus('Submitted');
+    onUploaded?.();
   }
 
   return (
-    <div className="flex flex-col gap-2 mt-2">
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-      <button onClick={handleUpload} className="bg-green-500 text-white p-1">
-        Upload
-      </button>
-      {status && <p>{status}</p>}
+    <div className="relative mt-2">
+      {exampleUrl && (
+        <img
+          src={exampleUrl}
+          alt="example"
+          className="h-32 w-full object-cover rounded"
+          onClick={() => !submitted && inputRef.current.click()}
+        />
+      )}
+      {!submitted && (
+        <div
+          onClick={() => inputRef.current.click()}
+          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-semibold rounded animate-heartbeat cursor-pointer"
+        >
+          Click to upload your version
+        </div>
+      )}
+      <input
+        type="file"
+        ref={inputRef}
+        onChange={handleFile}
+        className="hidden"
+      />
+      {status && <p className="text-green-700 mt-1">{status}</p>}
     </div>
   );
 }
