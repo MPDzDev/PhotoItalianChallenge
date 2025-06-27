@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 
 export default function AdminTable() {
   const [submissions, setSubmissions] = useState([]);
+  const [signedUrls, setSignedUrls] = useState({});
 
   useEffect(() => {
     const channel = supabase
@@ -22,6 +23,21 @@ export default function AdminTable() {
       .select('id, status, photo_url, challenge_id, user_id, created_at')
       .order('created_at');
     setSubmissions(data || []);
+    if (data) {
+      const urls = {};
+      await Promise.all(
+        data.map(async (s) => {
+          if (s.photo_url) {
+            const { data: url } = await supabase
+              .storage
+              .from('photos')
+              .createSignedUrl(s.photo_url, 60 * 60);
+            urls[s.id] = url?.signedUrl;
+          }
+        })
+      );
+      setSignedUrls(urls);
+    }
   }
 
   async function updateStatus(id, status) {
@@ -44,7 +60,7 @@ export default function AdminTable() {
         {submissions.map((s) => (
           <tr key={s.id} className="border-t">
             <td className="border p-2">
-              <img src={supabase.storage.from('photos').getPublicUrl(s.photo_url).data.publicUrl} alt="submission" className="h-20" />
+              <img src={signedUrls[s.id]} alt="submission" className="h-20" />
             </td>
             <td className="border p-2">{s.status}</td>
             <td className="border p-2">
