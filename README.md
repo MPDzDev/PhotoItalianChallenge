@@ -192,6 +192,7 @@ npm run dev
 1. Sign in with your email and password.
 2. Earliest unlocked challenge shows an **Upload** input.
 3. After upload, card turns yellow (pending). When admin approves, card turns green and the next challenge unlocks.
+4. View a table of your submitted photos with their current approval status below the challenges.
 
 ---
 
