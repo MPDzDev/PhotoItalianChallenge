@@ -8,9 +8,8 @@ export default function Hunt() {
   const [user, setUser] = useState(null);
   const [challenges, setChallenges] = useState([]);
   const [exampleUrls, setExampleUrls] = useState({});
-  const [submittedChallenges, setSubmittedChallenges] = useState(new Set());
   const [challengeStatus, setChallengeStatus] = useState({});
-  const [openId, setOpenId] = useState(null);
+  const [expanded, setExpanded] = useState(null);
   const navigate = useNavigate();
 
   const ADMIN_WHITELIST = ['mdziedzic97@gmail.com'];
@@ -41,14 +40,15 @@ export default function Hunt() {
     async function loadSubmitted() {
       const { data } = await supabase
         .from('submissions')
-        .select('challenge_id, status')
-        .eq('user_id', user.id);
-      setSubmittedChallenges(new Set(data ? data.map((s) => s.challenge_id) : []));
-      const statuses = {};
+        .select('challenge_id, status, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      const statusMap = {};
       data?.forEach((s) => {
-        statuses[s.challenge_id] = s.status;
+        if (!statusMap[s.challenge_id]) statusMap[s.challenge_id] = s.status;
       });
-      setChallengeStatus(statuses);
+      setChallengeStatus(statusMap);
+
     }
     loadSubmitted();
     const channel = supabase
@@ -114,46 +114,40 @@ export default function Hunt() {
       )}
       {challenges.map((c) => {
         const status = challengeStatus[c.id];
-        const rowColor =
-          status === 'approved'
-            ? 'bg-green-200'
-            : status === 'rejected'
-            ? 'bg-red-200'
-            : 'bg-amber-200';
-        const isOpen = openId === c.id;
+        let rowClass = 'bg-amber-100';
+        if (status === 'approved') rowClass = 'bg-green-200';
+        else if (status === 'rejected') rowClass = 'bg-red-200';
         return (
-          <div key={c.id} className="border rounded overflow-hidden">
+          <div key={c.id} className={`${rowClass} rounded shadow`}>
             <div
-              className={`p-2 font-bold cursor-pointer ${rowColor}`}
-              onClick={() => setOpenId(isOpen ? null : c.id)}
+              onClick={() => setExpanded(expanded === c.id ? null : c.id)}
+              className="p-2 cursor-pointer font-bold"
             >
               {c.title}
             </div>
-            {isOpen && (
-              <div className="p-2 bg-white">
-                {c.description && <p className="italic mb-2">{c.description}</p>}
+            {expanded === c.id && (
+              <div className="p-4 border-t bg-white rounded-b">
+                {c.description && (
+                  <p className="italic mb-2">{c.description}</p>
+                )}
                 {c.hint && <p className="mb-2">Hint: {c.hint}</p>}
                 <UploadPhoto
                   challengeId={c.id}
                   userId={user.id}
                   exampleUrl={exampleUrls[c.id]}
-                  submitted={submittedChallenges.has(c.id)}
-                  onUploaded={() => {
-                    setSubmittedChallenges(
-                      new Set([...submittedChallenges, c.id])
-                    );
-                    setChallengeStatus((prev) => ({
-                      ...prev,
+                  submitted={!!status}
+                  onUploaded={() =>
+                    setChallengeStatus({
+                      ...challengeStatus,
                       [c.id]: 'pending',
-                    }));
-                  }}
+                    })
+                  }
                 />
               </div>
             )}
           </div>
         );
-      })
-      <MySubmissions userId={user.id} />
+      })}
     </div>
   );
 }
