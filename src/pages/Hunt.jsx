@@ -157,6 +157,11 @@ export default function Hunt() {
       <h1 className="text-2xl text-center mb-2">
         {`Ready, set, snap! ${approvedCount}/10 photo challenges approved.`}
       </h1>
+      <p className="text-center mb-4">
+        Tap a card to read its instructions and view the sample image. Upload
+        your own photo to complete the task &mdash; challenges can be tackled in
+        any order and each approved shot earns a coin.
+      </p>
       {challenges.map((c) => {
         const status = challengeStatus[c.id];
         let rowClass = 'bg-amber-100';

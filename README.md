@@ -4,6 +4,11 @@ A lightweight React/Vite web app that lets players submit photo proof for each s
 
 This repository contains a minimal MVP implementation located in the src folder.
 
+To play, sign in and pick any photo challenge to start. Expand a challenge card
+to read its description and hint, then upload your own photo matching the
+example. Once your shot is approved you earn a coin — the challenges can be
+completed in any order.
+
 ---
 
 ## 1 Features
@@ -190,9 +195,9 @@ npm run dev
 ## 9 Player Workflow
 
 1. Sign in with your email and password.
-2. Earliest unlocked challenge shows an **Upload** input.
-3. After upload, card turns yellow (pending). When admin approves, card turns green and the next challenge unlocks.
-4. View a table of your submitted photos with their current approval status below the challenges.
+2. Choose any challenge; each card shows an **Upload** input if you haven't submitted yet.
+3. After upload, the card turns yellow while pending. Once approved it turns green and you earn a coin.
+4. Repeat for the remaining challenges in any order. A table below lists your submissions and their status.
 
 ---
 
