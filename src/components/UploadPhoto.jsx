@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import FullScreenImage from './FullScreenImage';
 import FullScreenHint from './FullScreenHint';
 import { compressImage } from '../utils/compressImage';
+import { cachePhoto } from '../utils/photoCache';
 
 export default function UploadPhoto({
   challengeId,
@@ -28,6 +29,8 @@ export default function UploadPhoto({
     if (!file) return;
     const filename = `${crypto.randomUUID()}`;
     const preview = await compressImage(file, 200000);
+    const localPreviewUrl = URL.createObjectURL(preview);
+    const localFullUrl = URL.createObjectURL(file);
     const { data, error } = await supabase.storage
       .from('photos')
       .upload(filename, file);
@@ -37,14 +40,19 @@ export default function UploadPhoto({
       .from('photos')
       .upload(`${filename}-preview.jpg`, preview);
 
-    await supabase.from('submissions').insert({
-      challenge_id: challengeId,
-      photo_url: data.path,
-      photo_preview: `${filename}-preview.jpg`,
-      user_id: userId,
-    });
+    const { data: inserted } = await supabase
+      .from('submissions')
+      .insert({
+        challenge_id: challengeId,
+        photo_url: data.path,
+        photo_preview: `${filename}-preview.jpg`,
+        user_id: userId,
+      })
+      .select()
+      .single();
     setMessage('Submitted');
-    onUploaded?.();
+    if (inserted?.id) cachePhoto(inserted.id, localPreviewUrl, localFullUrl);
+    onUploaded?.(inserted?.id, localPreviewUrl, localFullUrl);
   }
 
   const photoSrc = submitted && userPhotoUrl ? userPhotoUrl : exampleUrl;

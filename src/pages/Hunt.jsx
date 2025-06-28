@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import UploadPhoto from '../components/UploadPhoto';
 import FullScreenImage from '../components/FullScreenImage';
 import { useNavigate } from 'react-router-dom';
+import { cachePhoto, getPreview, getFull } from '../utils/photoCache';
 
 export default function Hunt() {
   const [user, setUser] = useState(null);
@@ -60,13 +61,19 @@ export default function Hunt() {
             subsMap[s.challenge_id].push(s);
             if (!statusMap[s.challenge_id]) statusMap[s.challenge_id] = s.status;
             if (!commentMap[s.challenge_id]) commentMap[s.challenge_id] = s.comment;
-            if (s.photo_preview) {
+            const cachedPreview = getPreview(s.id);
+            const cachedFull = getFull(s.id);
+            if (cachedPreview) {
+              previewUrls[s.id] = cachedPreview;
+            } else if (s.photo_preview) {
               const { data: url } = await supabase.storage
                 .from('photos')
                 .createSignedUrl(s.photo_preview, 60 * 60);
               previewUrls[s.id] = url?.signedUrl;
             }
-            if (s.photo_url) {
+            if (cachedFull) {
+              fullUrls[s.id] = cachedFull;
+            } else if (s.photo_url) {
               const { data: url } = await supabase.storage
                 .from('photos')
                 .createSignedUrl(s.photo_url, 60 * 60);
@@ -188,7 +195,7 @@ export default function Hunt() {
                   title={c.title}
                   description={c.description}
                   hint={c.hint}
-                  onUploaded={() => {
+                  onUploaded={(id, previewUrl, fullUrl) => {
                     setChallengeStatus({
                       ...challengeStatus,
                       [c.id]: 'pending',
@@ -197,6 +204,16 @@ export default function Hunt() {
                       ...challengeComments,
                       [c.id]: '',
                     });
+                    if (id) {
+                      setMySubs((prev) => {
+                        const list = prev[c.id] ? [...prev[c.id]] : [];
+                        list.unshift({ id });
+                        return { ...prev, [c.id]: list };
+                      });
+                      setSubPreviewUrls((p) => ({ ...p, [id]: previewUrl }));
+                      setSubFullUrls((p) => ({ ...p, [id]: fullUrl }));
+                      cachePhoto(id, previewUrl, fullUrl);
+                    }
                   }}
                 />
               </div>
