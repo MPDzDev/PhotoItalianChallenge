@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import FullScreenImage from './FullScreenImage';
+import { getPreview, getFull } from '../utils/photoCache';
 
 export default function MySubmissions({ userId }) {
   const [subs, setSubs] = useState([]);
@@ -22,14 +23,20 @@ export default function MySubmissions({ userId }) {
         const fulls = {};
         await Promise.all(
           data.map(async (s) => {
-            if (s.photo_preview) {
+            const cachedPreview = getPreview(s.id);
+            const cachedFull = getFull(s.id);
+            if (cachedPreview) {
+              previews[s.id] = cachedPreview;
+            } else if (s.photo_preview) {
               const { data: url } = await supabase
                 .storage
                 .from('photos')
                 .createSignedUrl(s.photo_preview, 60 * 60);
               previews[s.id] = url?.signedUrl;
             }
-            if (s.photo_url) {
+            if (cachedFull) {
+              fulls[s.id] = cachedFull;
+            } else if (s.photo_url) {
               const { data: url } = await supabase
                 .storage
                 .from('photos')
