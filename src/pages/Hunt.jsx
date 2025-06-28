@@ -125,6 +125,10 @@ export default function Hunt() {
     return () => supabase.removeChannel(channel);
   }, []);
 
+  const approvedCount = Object.values(challengeStatus).filter(
+    (status) => status === 'approved'
+  ).length;
+
   if (!user) {
     return (
       <div className="p-4">
@@ -144,7 +148,7 @@ export default function Hunt() {
         </button>
       )}
       <h1 className="text-2xl text-center mb-2">
-        Ready, set, snap! Complete 10 photo challenges to unlock your reward.
+        {`Ready, set, snap! ${approvedCount}/10 photo challenges approved.`}
       </h1>
       {challenges.map((c) => {
         const status = challengeStatus[c.id];
