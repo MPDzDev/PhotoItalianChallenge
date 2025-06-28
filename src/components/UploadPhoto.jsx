@@ -49,6 +49,14 @@ export default function UploadPhoto({
 
   const photoSrc = submitted && userPhotoUrl ? userPhotoUrl : exampleUrl;
 
+  function handleImageClick() {
+    if (status === 'rejected') {
+      inputRef.current?.click();
+    } else {
+      setShowExample(true);
+    }
+  }
+
   return (
     <div className="relative mt-2 polaroid">
       <div className="relative">
@@ -58,7 +66,7 @@ export default function UploadPhoto({
               src={photoSrc}
               alt="example"
               className="w-full object-contain cursor-pointer"
-              onClick={() => setShowExample(true)}
+              onClick={handleImageClick}
             />
             {status && (
               <span
@@ -89,14 +97,14 @@ export default function UploadPhoto({
             )}
           </>
         )}
-        {!submitted && (
+        {!submitted || status === 'rejected' ? (
           <div
             onClick={() => inputRef.current.click()}
             className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-sm font-semibold animate-heartbeat cursor-pointer"
           >
-            Click to upload your version
+            {status === 'rejected' ? 'Click to upload again' : 'Click to upload your version'}
           </div>
-        )}
+        ) : null}
       </div>
       {hint && (
         <button
