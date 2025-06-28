@@ -26,7 +26,7 @@ export default function Login() {
     let subscription;
     async function initSession() {
       try {
-        const { data } = await supabase.auth.getSessionFromUrl();
+        const { data } = await supabase.auth.exchangeCodeForSession(window.location.href);
         if (data?.session) {
           navigate('/hunt');
           return;
