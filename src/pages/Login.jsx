@@ -10,6 +10,18 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
+  async function handleGoogleLogin() {
+    setErrorMsg('');
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+      if (error) {
+        setErrorMsg(error.message || 'Authentication failed');
+      }
+    } catch (err) {
+      setErrorMsg('Server error. Check configuration and network.');
+    }
+  }
+
   useEffect(() => {
     let subscription;
     async function checkSession() {
@@ -117,6 +129,15 @@ export default function Login() {
               className="underline"
             >
               {mode === 'login' ? 'Need an account?' : 'Have an account?'}
+            </button>
+          </div>
+          <div className="flex justify-center mt-2">
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="bg-red-600 text-white px-4 py-2 rounded"
+            >
+              Sign in with Google
             </button>
           </div>
           {errorMsg && <p className="text-red-600">{errorMsg}</p>}
