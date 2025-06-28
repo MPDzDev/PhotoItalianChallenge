@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import FullScreenImage from './FullScreenImage';
 import FullScreenHint from './FullScreenHint';
+import { compressImage } from '../utils/compressImage';
 
 export default function UploadPhoto({
   challengeId,
@@ -11,6 +12,7 @@ export default function UploadPhoto({
   status,
   comment,
   userPhotoUrl,
+  userFullPhotoUrl,
   onUploaded,
   title,
   description,
@@ -25,14 +27,20 @@ export default function UploadPhoto({
     const file = e.target.files?.[0];
     if (!file) return;
     const filename = `${crypto.randomUUID()}`;
+    const preview = await compressImage(file, 200000);
     const { data, error } = await supabase.storage
       .from('photos')
       .upload(filename, file);
     if (error) return setMessage('Upload failed');
 
+    await supabase.storage
+      .from('photos')
+      .upload(`${filename}-preview.jpg`, preview);
+
     await supabase.from('submissions').insert({
       challenge_id: challengeId,
       photo_url: data.path,
+      photo_preview: `${filename}-preview.jpg`,
       user_id: userId,
     });
     setMessage('Submitted');
@@ -75,6 +83,7 @@ export default function UploadPhoto({
               <FullScreenImage
                 src={photoSrc}
                 alt="example"
+                downloadUrl={submitted ? userFullPhotoUrl : null}
                 onClose={() => setShowExample(false)}
               />
             )}

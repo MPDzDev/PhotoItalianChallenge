@@ -11,7 +11,8 @@ export default function Hunt() {
   const [challengeStatus, setChallengeStatus] = useState({});
   const [challengeComments, setChallengeComments] = useState({});
   const [mySubs, setMySubs] = useState({});
-  const [subUrls, setSubUrls] = useState({});
+  const [subPreviewUrls, setSubPreviewUrls] = useState({});
+  const [subFullUrls, setSubFullUrls] = useState({});
   const [expanded, setExpanded] = useState(null);
   const [viewerUrl, setViewerUrl] = useState(null);
   const navigate = useNavigate();
@@ -44,13 +45,14 @@ export default function Hunt() {
     async function loadSubmitted() {
       const { data } = await supabase
         .from('submissions')
-        .select('id, challenge_id, status, comment, photo_url, created_at')
+        .select('id, challenge_id, status, comment, photo_url, photo_preview, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
       const statusMap = {};
       const commentMap = {};
       const subsMap = {};
-      const urls = {};
+      const previewUrls = {};
+      const fullUrls = {};
       if (data) {
         await Promise.all(
           data.map(async (s) => {
@@ -58,11 +60,17 @@ export default function Hunt() {
             subsMap[s.challenge_id].push(s);
             if (!statusMap[s.challenge_id]) statusMap[s.challenge_id] = s.status;
             if (!commentMap[s.challenge_id]) commentMap[s.challenge_id] = s.comment;
+            if (s.photo_preview) {
+              const { data: url } = await supabase.storage
+                .from('photos')
+                .createSignedUrl(s.photo_preview, 60 * 60);
+              previewUrls[s.id] = url?.signedUrl;
+            }
             if (s.photo_url) {
               const { data: url } = await supabase.storage
                 .from('photos')
                 .createSignedUrl(s.photo_url, 60 * 60);
-              urls[s.id] = url?.signedUrl;
+              fullUrls[s.id] = url?.signedUrl;
             }
           })
         );
@@ -70,7 +78,8 @@ export default function Hunt() {
       setChallengeStatus(statusMap);
       setChallengeComments(commentMap);
       setMySubs(subsMap);
-      setSubUrls(urls);
+      setSubPreviewUrls(previewUrls);
+      setSubFullUrls(fullUrls);
     }
     loadSubmitted();
     const channel = supabase
@@ -161,7 +170,12 @@ export default function Hunt() {
                   comment={challengeComments[c.id]}
                   userPhotoUrl={
                     mySubs[c.id] && mySubs[c.id].length > 0
-                      ? subUrls[mySubs[c.id][0].id]
+                      ? subPreviewUrls[mySubs[c.id][0].id]
+                      : null
+                  }
+                  userFullPhotoUrl={
+                    mySubs[c.id] && mySubs[c.id].length > 0
+                      ? subFullUrls[mySubs[c.id][0].id]
                       : null
                   }
                   title={c.title}
