@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
+import { compressImage } from '../utils/compressImage';
 
 export default function CreateChallenge() {
   const [title, setTitle] = useState('');
@@ -16,9 +17,10 @@ export default function CreateChallenge() {
     let examplePhotoPath = null;
     if (examplePhoto) {
       const filename = `${crypto.randomUUID()}`;
+      const compressed = await compressImage(examplePhoto);
       const { data, error } = await supabase.storage
         .from('photos')
-        .upload(filename, examplePhoto);
+        .upload(filename, compressed);
       if (error) {
         setStatus('Photo upload failed');
         return;
