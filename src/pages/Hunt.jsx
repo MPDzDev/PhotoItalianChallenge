@@ -167,6 +167,15 @@ export default function Hunt() {
         let rowClass = 'bg-amber-100';
         if (status === 'approved') rowClass = 'bg-green-200';
         else if (status === 'rejected') rowClass = 'bg-red-200';
+        else if (status === 'pending') rowClass = 'bg-yellow-200';
+        const statusText =
+          status === 'approved'
+            ? 'Approved'
+            : status === 'rejected'
+            ? 'Rejected'
+            : status === 'pending'
+            ? 'Pending review'
+            : 'Not submitted';
         return (
           <div
             key={c.id}
@@ -174,9 +183,10 @@ export default function Hunt() {
           >
             <div
               onClick={() => setExpanded(expanded === c.id ? null : c.id)}
-              className="p-3 cursor-pointer font-bold text-lg"
+              className="p-3 cursor-pointer font-bold text-lg flex justify-between items-center"
             >
-              {c.title}
+              <span>{c.title}</span>
+              <span className="text-sm font-normal">{statusText}</span>
             </div>
             {expanded === c.id && (
               <div className="p-4 border-t bg-white rounded-b space-y-4">
