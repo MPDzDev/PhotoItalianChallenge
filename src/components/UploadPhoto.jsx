@@ -9,6 +9,7 @@ export default function UploadPhoto({
   exampleUrl,
   submitted,
   status,
+  comment,
   userPhotoUrl,
   onUploaded,
   title,
@@ -62,6 +63,11 @@ export default function UploadPhoto({
                 }`}
               >
                 {status}
+              </span>
+            )}
+            {comment && (
+              <span className="absolute bottom-1 right-1 text-xs bg-white bg-opacity-70 px-1 rounded whitespace-pre-wrap max-w-[70%] text-right">
+                {comment}
               </span>
             )}
             {showHint && <FullScreenHint text={hint} onClose={() => setShowHint(false)} />}

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import FullScreenImage from './FullScreenImage';
+import CommentModal from './CommentModal';
 
 export default function AdminTable() {
   const [submissions, setSubmissions] = useState([]);
   const [signedUrls, setSignedUrls] = useState({});
   const [viewerUrl, setViewerUrl] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null); // {id, status}
 
   useEffect(() => {
     const channel = supabase
@@ -22,7 +24,7 @@ export default function AdminTable() {
   async function load() {
     const { data } = await supabase
       .from('submissions')
-      .select('id, status, photo_url, challenge_id, user_id, created_at')
+      .select('id, status, comment, photo_url, challenge_id, user_id, created_at')
       .order('created_at');
     setSubmissions(data || []);
     if (data) {
@@ -42,8 +44,11 @@ export default function AdminTable() {
     }
   }
 
-  async function updateStatus(id, status) {
-    await supabase.from('submissions').update({ status }).eq('id', id);
+  async function updateStatus(id, status, comment) {
+    await supabase
+      .from('submissions')
+      .update({ status, comment })
+      .eq('id', id);
   }
 
   return (
@@ -53,6 +58,7 @@ export default function AdminTable() {
         <tr>
           <th className="border p-2">Photo</th>
           <th className="border p-2">Status</th>
+          <th className="border p-2">Comment</th>
           <th className="border p-2">Action</th>
         </tr>
       </thead>
@@ -68,9 +74,10 @@ export default function AdminTable() {
               />
             </td>
             <td className="border p-2">{s.status}</td>
+            <td className="border p-2 whitespace-pre-wrap">{s.comment}</td>
             <td className="border p-2">
-              <button onClick={() => updateStatus(s.id, 'approved')} className="bg-green-500 text-white px-2 mr-1">Accept</button>
-              <button onClick={() => updateStatus(s.id, 'rejected')} className="bg-red-500 text-white px-2">Reject</button>
+              <button onClick={() => setPendingAction({ id: s.id, status: 'approved' })} className="bg-green-500 text-white px-2 mr-1">Accept</button>
+              <button onClick={() => setPendingAction({ id: s.id, status: 'rejected' })} className="bg-red-500 text-white px-2">Reject</button>
             </td>
           </tr>
         ))}
@@ -78,6 +85,15 @@ export default function AdminTable() {
       </table>
       {viewerUrl && (
         <FullScreenImage src={viewerUrl} alt="submission" onClose={() => setViewerUrl(null)} />
+      )}
+      {pendingAction && (
+        <CommentModal
+          onCancel={() => setPendingAction(null)}
+          onSubmit={async (comment) => {
+            await updateStatus(pendingAction.id, pendingAction.status, comment);
+            setPendingAction(null);
+          }}
+        />
       )}
     </div>
   );

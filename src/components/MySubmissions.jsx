@@ -10,7 +10,7 @@ export default function MySubmissions({ userId }) {
     async function load() {
       const { data } = await supabase
         .from('submissions')
-        .select('id, status, photo_url, challenge_id(title), created_at')
+        .select('id, status, comment, photo_url, challenge_id(title), created_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
       setSubs(data || []);
@@ -53,6 +53,7 @@ export default function MySubmissions({ userId }) {
             <th className="border p-2">Challenge</th>
             <th className="border p-2">Photo</th>
             <th className="border p-2">Status</th>
+            <th className="border p-2">Comment</th>
           </tr>
         </thead>
         <tbody>
@@ -63,6 +64,7 @@ export default function MySubmissions({ userId }) {
                 <img src={urls[s.id]} alt="submission" className="h-20" />
               </td>
               <td className="border p-2">{s.status}</td>
+              <td className="border p-2 whitespace-pre-wrap">{s.comment}</td>
             </tr>
           ))}
         </tbody>
