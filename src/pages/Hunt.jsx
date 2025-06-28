@@ -143,6 +143,9 @@ export default function Hunt() {
           Go to Admin Panel
         </button>
       )}
+      <h1 className="text-2xl text-center mb-2">
+        Ready, set, snap! Complete 10 photo challenges to unlock your reward.
+      </h1>
       {challenges.map((c) => {
         const status = challengeStatus[c.id];
         let rowClass = 'bg-amber-100';
