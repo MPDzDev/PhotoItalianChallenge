@@ -148,7 +148,6 @@ export default function Hunt() {
             </div>
             {expanded === c.id && (
               <div className="p-4 border-t bg-white rounded-b space-y-4">
-                {c.hint && <p className="text-sm text-gray-600">Hint: {c.hint}</p>}
                 <UploadPhoto
                   challengeId={c.id}
                   userId={user.id}
@@ -162,6 +161,7 @@ export default function Hunt() {
                   }
                   title={c.title}
                   description={c.description}
+                  hint={c.hint}
                   onUploaded={() =>
                     setChallengeStatus({
                       ...challengeStatus,

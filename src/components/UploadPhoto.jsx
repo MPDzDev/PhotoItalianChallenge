@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { supabase } from '../supabaseClient';
 import FullScreenImage from './FullScreenImage';
+import FullScreenHint from './FullScreenHint';
 
 export default function UploadPhoto({
   challengeId,
@@ -12,10 +13,12 @@ export default function UploadPhoto({
   onUploaded,
   title,
   description,
+  hint,
 }) {
   const inputRef = useRef(null);
   const [message, setMessage] = useState('');
   const [showExample, setShowExample] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   async function handleFile(e) {
     const file = e.target.files?.[0];
@@ -50,7 +53,7 @@ export default function UploadPhoto({
             />
             {status && (
               <span
-                className={`absolute bottom-1 right-1 text-xs px-1 rounded bg-white bg-opacity-70 ${
+                className={`absolute bottom-1 left-1 text-xs px-1 rounded bg-white bg-opacity-70 ${
                   status === 'approved'
                     ? 'text-green-700'
                     : status === 'rejected'
@@ -61,6 +64,18 @@ export default function UploadPhoto({
                 {status}
               </span>
             )}
+            {hint && (
+              <button
+                className="absolute bottom-1 right-1 text-xs font-bold bg-white bg-opacity-70 rounded-full w-5 h-5 flex items-center justify-center"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowHint(true);
+                }}
+              >
+                ?
+              </button>
+            )}
+            {showHint && <FullScreenHint text={hint} onClose={() => setShowHint(false)} />}
             {showExample && (
               <FullScreenImage
                 src={photoSrc}
