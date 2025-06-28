@@ -4,6 +4,7 @@ import UploadPhoto from '../components/UploadPhoto';
 import FullScreenImage from '../components/FullScreenImage';
 import { useNavigate } from 'react-router-dom';
 import LogoutButton from '../components/LogoutButton';
+import ChallengeMaster from '../components/ChallengeMaster';
 import { cachePhoto, getPreview, getFull } from '../utils/photoCache';
 
 export default function Hunt() {
@@ -158,7 +159,7 @@ export default function Hunt() {
           )}
           <LogoutButton className="bg-gray-300 px-3 py-1 rounded" />
         </div>
-        <h1 className="text-2xl text-center">
+      <h1 className="text-2xl text-center">
         {`Ready, set, snap! ${approvedCount}/10 photo challenges approved.`}
       </h1>
       <p className="text-center">
@@ -166,6 +167,7 @@ export default function Hunt() {
         your own photo to complete the task &mdash; challenges can be tackled in
         any order.
       </p>
+      <ChallengeMaster approvedCount={approvedCount} />
       {challenges.map((c) => {
         const status = challengeStatus[c.id];
         let rowClass = 'bg-amber-100';
