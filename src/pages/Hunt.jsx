@@ -9,6 +9,7 @@ export default function Hunt() {
   const [challenges, setChallenges] = useState([]);
   const [exampleUrls, setExampleUrls] = useState({});
   const [challengeStatus, setChallengeStatus] = useState({});
+  const [challengeComments, setChallengeComments] = useState({});
   const [mySubs, setMySubs] = useState({});
   const [subUrls, setSubUrls] = useState({});
   const [expanded, setExpanded] = useState(null);
@@ -43,10 +44,11 @@ export default function Hunt() {
     async function loadSubmitted() {
       const { data } = await supabase
         .from('submissions')
-        .select('id, challenge_id, status, photo_url, created_at')
+        .select('id, challenge_id, status, comment, photo_url, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
       const statusMap = {};
+      const commentMap = {};
       const subsMap = {};
       const urls = {};
       if (data) {
@@ -55,6 +57,7 @@ export default function Hunt() {
             if (!subsMap[s.challenge_id]) subsMap[s.challenge_id] = [];
             subsMap[s.challenge_id].push(s);
             if (!statusMap[s.challenge_id]) statusMap[s.challenge_id] = s.status;
+            if (!commentMap[s.challenge_id]) commentMap[s.challenge_id] = s.comment;
             if (s.photo_url) {
               const { data: url } = await supabase.storage
                 .from('photos')
@@ -65,6 +68,7 @@ export default function Hunt() {
         );
       }
       setChallengeStatus(statusMap);
+      setChallengeComments(commentMap);
       setMySubs(subsMap);
       setSubUrls(urls);
     }
@@ -154,6 +158,7 @@ export default function Hunt() {
                   exampleUrl={exampleUrls[c.id]}
                   submitted={!!status}
                   status={status}
+                  comment={challengeComments[c.id]}
                   userPhotoUrl={
                     mySubs[c.id] && mySubs[c.id].length > 0
                       ? subUrls[mySubs[c.id][0].id]
@@ -162,12 +167,16 @@ export default function Hunt() {
                   title={c.title}
                   description={c.description}
                   hint={c.hint}
-                  onUploaded={() =>
+                  onUploaded={() => {
                     setChallengeStatus({
                       ...challengeStatus,
                       [c.id]: 'pending',
-                    })
-                  }
+                    });
+                    setChallengeComments({
+                      ...challengeComments,
+                      [c.id]: '',
+                    });
+                  }}
                 />
               </div>
             )}
