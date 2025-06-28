@@ -1,5 +1,5 @@
 import React from 'react';
-import pirateImg from '../assets/pirate-master.svg';
+import pirateImg from '../assets/pirate-master.png';
 
 export default function ChallengeMaster({ approvedCount }) {
   // Blur decreases with progress but stays heavy until fully completed.
