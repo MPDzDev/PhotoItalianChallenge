@@ -4,6 +4,7 @@ import AdminTable from '../components/AdminTable';
 import CreateChallenge from '../components/CreateChallenge';
 import ChallengeList from '../components/ChallengeList';
 import { Navigate, useNavigate } from 'react-router-dom';
+import LogoutButton from '../components/LogoutButton';
 
 export default function Admin() {
   const [user, setUser] = useState(null);
@@ -39,12 +40,15 @@ export default function Admin() {
 
   return (
     <div className="p-4">
-      <button
-        onClick={() => navigate('/hunt')}
-        className="bg-purple-600 text-white px-3 py-1 rounded mb-4"
-      >
-        Go to Hunt Panel
-      </button>
+      <div className="flex justify-between mb-4">
+        <button
+          onClick={() => navigate('/hunt')}
+          className="bg-purple-600 text-white px-3 py-1 rounded"
+        >
+          Go to Hunt Panel
+        </button>
+        <LogoutButton className="bg-gray-300 px-3 py-1 rounded" />
+      </div>
       <h1 className="text-xl mb-4">Admin Dashboard</h1>
       <CreateChallenge />
       <ChallengeList />
