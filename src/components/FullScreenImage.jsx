@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
-export default function FullScreenImage({ src, alt = '', onClose }) {
+export default function FullScreenImage({ src, alt = '', onClose, downloadUrl }) {
   const getOrientation = () =>
     window.innerHeight >= window.innerWidth ? 'portrait' : 'landscape';
   const [orientation, setOrientation] = useState(getOrientation());
@@ -33,6 +33,16 @@ export default function FullScreenImage({ src, alt = '', onClose }) {
           orientation === 'portrait' ? 'max-h-screen' : 'max-w-screen'
         }`}
       />
+      {downloadUrl && (
+        <a
+          href={downloadUrl}
+          download
+          onClick={(e) => e.stopPropagation()}
+          className="absolute top-2 right-2 bg-white text-black px-2 py-1 rounded shadow"
+        >
+          Download
+        </a>
+      )}
     </div>
   );
 

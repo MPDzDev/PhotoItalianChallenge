@@ -5,8 +5,9 @@ import CommentModal from './CommentModal';
 
 export default function AdminTable() {
   const [submissions, setSubmissions] = useState([]);
-  const [signedUrls, setSignedUrls] = useState({});
-  const [viewerUrl, setViewerUrl] = useState(null);
+  const [previewUrls, setPreviewUrls] = useState({});
+  const [downloadUrls, setDownloadUrls] = useState({});
+  const [viewer, setViewer] = useState(null); // {preview, download}
   const [pendingAction, setPendingAction] = useState(null); // {id, status}
 
   useEffect(() => {
@@ -24,23 +25,32 @@ export default function AdminTable() {
   async function load() {
     const { data } = await supabase
       .from('submissions')
-      .select('id, status, comment, photo_url, challenge_id, user_id, created_at')
+      .select('id, status, comment, photo_url, photo_preview, challenge_id, user_id, created_at')
       .order('created_at');
     setSubmissions(data || []);
     if (data) {
-      const urls = {};
+      const previews = {};
+      const fulls = {};
       await Promise.all(
         data.map(async (s) => {
+          if (s.photo_preview) {
+            const { data: url } = await supabase
+              .storage
+              .from('photos')
+              .createSignedUrl(s.photo_preview, 60 * 60);
+            previews[s.id] = url?.signedUrl;
+          }
           if (s.photo_url) {
             const { data: url } = await supabase
               .storage
               .from('photos')
               .createSignedUrl(s.photo_url, 60 * 60);
-            urls[s.id] = url?.signedUrl;
+            fulls[s.id] = url?.signedUrl;
           }
         })
       );
-      setSignedUrls(urls);
+      setPreviewUrls(previews);
+      setDownloadUrls(fulls);
     }
   }
 
@@ -67,10 +77,10 @@ export default function AdminTable() {
           <tr key={s.id} className="border-t">
             <td className="border p-2">
               <img
-                src={signedUrls[s.id]}
+                src={previewUrls[s.id]}
                 alt="submission"
                 className="h-20 cursor-pointer"
-                onClick={() => setViewerUrl(signedUrls[s.id])}
+                onClick={() => setViewer({ preview: previewUrls[s.id], download: downloadUrls[s.id] })}
               />
             </td>
             <td className="border p-2">{s.status}</td>
@@ -83,8 +93,13 @@ export default function AdminTable() {
         ))}
       </tbody>
       </table>
-      {viewerUrl && (
-        <FullScreenImage src={viewerUrl} alt="submission" onClose={() => setViewerUrl(null)} />
+      {viewer && (
+        <FullScreenImage
+          src={viewer.preview}
+          downloadUrl={viewer.download}
+          alt="submission"
+          onClose={() => setViewer(null)}
+        />
       )}
       {pendingAction && (
         <CommentModal
