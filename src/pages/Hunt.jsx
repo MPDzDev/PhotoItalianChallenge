@@ -3,6 +3,7 @@ import { supabase } from '../supabaseClient';
 import UploadPhoto from '../components/UploadPhoto';
 import FullScreenImage from '../components/FullScreenImage';
 import { useNavigate } from 'react-router-dom';
+import LogoutButton from '../components/LogoutButton';
 import { cachePhoto, getPreview, getFull } from '../utils/photoCache';
 
 export default function Hunt() {
@@ -145,16 +146,19 @@ export default function Hunt() {
   }
 
   return (
-    <div className="p-4 flex flex-col gap-4">
-      {ADMIN_WHITELIST.includes(user.email) && (
-        <button
-          onClick={() => navigate('/admin')}
-          className="bg-purple-600 text-white px-3 py-1 rounded self-start"
-        >
-          Go to Admin Panel
-        </button>
-      )}
-      <h1 className="text-2xl text-center">
+      <div className="p-4 flex flex-col gap-4">
+        <div className="flex justify-between">
+          {ADMIN_WHITELIST.includes(user.email) && (
+            <button
+              onClick={() => navigate('/admin')}
+              className="bg-purple-600 text-white px-3 py-1 rounded self-start"
+            >
+              Go to Admin Panel
+            </button>
+          )}
+          <LogoutButton className="bg-gray-300 px-3 py-1 rounded" />
+        </div>
+        <h1 className="text-2xl text-center">
         {`Ready, set, snap! ${approvedCount}/10 photo challenges approved.`}
       </h1>
       <p className="text-center">
