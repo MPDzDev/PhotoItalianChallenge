@@ -10,8 +10,10 @@ export default function ChallengeMaster({ approvedCount }) {
       <img
         src={pirateImg}
         alt="Pirate Challenge Master"
-        style={{ filter: `blur(${blurLevel}px)` }}
-        className="w-48 h-auto mx-auto rounded"
+        style={{ filter: `blur(${blurLevel}px)`, pointerEvents: 'none' }}
+        className="w-48 h-auto mx-auto rounded select-none"
+        onContextMenu={(e) => e.preventDefault()}
+        draggable={false}
       />
       {approvedCount >= 10 ? (
         <p className="mt-2 font-bold">Ask this person where the treasure is!</p>
