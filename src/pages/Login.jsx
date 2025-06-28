@@ -24,13 +24,23 @@ export default function Login() {
 
   useEffect(() => {
     let subscription;
-    async function checkSession() {
+    async function initSession() {
+      try {
+        const { data } = await supabase.auth.getSessionFromUrl();
+        if (data?.session) {
+          navigate('/hunt');
+          return;
+        }
+      } catch (_) {
+        /* ignore missing auth params */
+      }
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
       if (session) navigate('/hunt');
     }
-    checkSession();
+    initSession();
     const {
       data: { subscription: sub },
     } = supabase.auth.onAuthStateChange((_event, session) => {
