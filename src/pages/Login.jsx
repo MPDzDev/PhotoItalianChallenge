@@ -30,6 +30,16 @@ export default function Login() {
   useEffect(() => {
     let subscription;
     async function initSession() {
+      try {
+        const { data } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        if (data?.session) {
+          navigate('/hunt');
+          return;
+        }
+      } catch (_) {
+        /* ignore missing auth params */
+      }
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
