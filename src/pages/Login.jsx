@@ -11,16 +11,21 @@ export default function Login() {
   const navigate = useNavigate();
 
   async function handleGoogleLogin() {
-    setErrorMsg('');
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
-      if (error) {
-        setErrorMsg(error.message || 'Authentication failed');
-      }
-    } catch (err) {
-      setErrorMsg('Server error. Check configuration and network.');
+  setErrorMsg('');
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/hunt',
+      },
+    });
+    if (error) {
+      setErrorMsg(error.message || 'Authentication failed');
     }
+  } catch {
+    setErrorMsg('Server error. Check configuration and network.');
   }
+}
 
   useEffect(() => {
     let subscription;
@@ -38,12 +43,14 @@ export default function Login() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
+      console.log('Current session:', session); // Log the current session
       if (session) navigate('/hunt');
     }
     initSession();
     const {
       data: { subscription: sub },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('Auth state changed:', session); // Log auth state changes
       if (session) navigate('/hunt');
     });
     subscription = sub;
