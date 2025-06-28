@@ -14,6 +14,7 @@ completed in any order.
 ## 1 Features
 
 - **Email/password authentication** with browser password-manager prompts
+- **Optional Google sign-in** once enabled in Supabase
 - **Role‑based access control** enforced by Supabase Row Level Security
 - **Image uploads** stored privately in Supabase Storage
 - **Real‑time updates**: players see status changes instantly
