@@ -20,6 +20,7 @@ completed in any order.
 - **Real‑time updates**: players see status changes instantly
 - **Admin dashboard** to accept/decline photos and adjust coin counts
 - **Coin counter** per player, persisted in Postgres
+- **Mystery pirate master** image reveals itself as you complete challenges
 - Deploys as a **static site** on Netlify; no server maintenance
 
 ---
