@@ -21,6 +21,25 @@ export default function FullScreenImage({ src, alt = '', onClose, downloadUrl })
     };
   }, [onClose]);
 
+  async function handleDownload(e) {
+    e.stopPropagation();
+    try {
+      const res = await fetch(downloadUrl);
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const name = downloadUrl.split('?')[0].split('/').pop() || 'photo';
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download failed', err);
+    }
+  }
+
   const content = (
     <div
       className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
@@ -34,14 +53,12 @@ export default function FullScreenImage({ src, alt = '', onClose, downloadUrl })
         }`}
       />
       {downloadUrl && (
-        <a
-          href={downloadUrl}
-          download
-          onClick={(e) => e.stopPropagation()}
+        <button
+          onClick={handleDownload}
           className="absolute top-2 right-2 bg-white text-black px-2 py-1 rounded shadow"
         >
           Download
-        </a>
+        </button>
       )}
     </div>
   );
