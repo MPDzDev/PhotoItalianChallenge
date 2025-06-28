@@ -44,9 +44,6 @@ export default function AdminTable() {
 
   async function updateStatus(id, status) {
     await supabase.from('submissions').update({ status }).eq('id', id);
-    if (status === 'approved') {
-      await supabase.rpc('increment_coins', { p_user: submissions.find((s) => s.id === id).user_id });
-    }
   }
 
   return (

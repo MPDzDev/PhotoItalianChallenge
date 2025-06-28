@@ -184,7 +184,7 @@ npm run dev
 
 1. Sign in with admin email.
 2. Pending submissions appear in a table ordered by `created_at`.
-3. Choose **Accept** → status flips to `approved` and `increment_coins()` fires.
+3. Choose **Accept** → status flips to `approved`.
 4. Choose **Decline** → status flips to `rejected`; player may re‑submit.
 
 ## 9 Player Workflow
