@@ -41,14 +41,14 @@ export default function UploadPhoto({
   const photoSrc = submitted && userPhotoUrl ? userPhotoUrl : exampleUrl;
 
   return (
-    <div className="mt-2 polaroid">
+    <div className="relative mt-2 polaroid">
       <div className="relative">
         {photoSrc && (
           <>
             <img
               src={photoSrc}
               alt="example"
-              className="w-full object-contain max-h-64 cursor-pointer"
+              className="w-full object-contain cursor-pointer"
               onClick={() => setShowExample(true)}
             />
             {status && (
@@ -63,17 +63,6 @@ export default function UploadPhoto({
               >
                 {status}
               </span>
-            )}
-            {hint && (
-              <button
-                className="absolute bottom-1 right-1 text-xs font-bold bg-white bg-opacity-70 rounded-full w-5 h-5 flex items-center justify-center"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowHint(true);
-                }}
-              >
-                ?
-              </button>
             )}
             {showHint && <FullScreenHint text={hint} onClose={() => setShowHint(false)} />}
             {showExample && (
@@ -94,6 +83,17 @@ export default function UploadPhoto({
           </div>
         )}
       </div>
+      {hint && (
+        <button
+          className="absolute bottom-1 right-1 text-xs font-bold bg-white bg-opacity-70 rounded-full w-5 h-5 flex items-center justify-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowHint(true);
+          }}
+        >
+          ?
+        </button>
+      )}
       <div className="mt-2 text-center text-sm handwriting">
         <p className="font-bold">{title}</p>
         {description && <p className="italic">{description}</p>}
